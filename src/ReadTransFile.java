@@ -8,16 +8,13 @@ import java.util.concurrent.Callable;
  * @author: zhangbaoning
  * @date: 2018/11/29
  * @since: JDK 1.8
- * @description: TODO
+ * @description: 清算交易对账单文件读取
  */
 public class ReadTransFile implements Callable<HashMap> {
+    private String tranFilePath;
 
-
-    public static void main(String[] args) {
-     /*   long start = System.currentTimeMillis();
-        new ReadFile().readFile();
-        long end = System.currentTimeMillis();
-        System.out.println((end - start) / 1000.000 + "s");*/
+    public ReadTransFile(String tranFilePath) {
+        this.tranFilePath = tranFilePath;
     }
 
     @Override
@@ -26,7 +23,7 @@ public class ReadTransFile implements Callable<HashMap> {
 
         // try-with-resource 自动关闭资源
         try (
-                Reader reader = new FileReader("C:/Users/lenovo/Desktop/延长壳牌建行聚合支付微信openid文件接口处理相关/trans-11252-20181018(清算交易对账单样例文件).txt");
+                Reader reader = new FileReader(tranFilePath);
                 LineNumberReader lineReader = new LineNumberReader(reader)
         ){
 
@@ -50,14 +47,12 @@ public class ReadTransFile implements Callable<HashMap> {
                         transList.add(ptlsh);
                         hashMap.put(ptlsh, transList);
                         i ++;
-                        System.out.println(ptlsh + "当前是第:" + i);
+                        System.out.println("当前是第:" + i);
                     } catch (Exception e) {
                         System.out.println(lineReader.getLineNumber() + "不存在");
                     }
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

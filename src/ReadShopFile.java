@@ -1,7 +1,7 @@
-import sun.security.krb5.internal.crypto.Aes256;
-import sun.security.provider.MD5;
+
 
 import java.io.*;
+import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,13 +11,18 @@ import java.util.concurrent.Callable;
  * @author: zhangbaoning
  * @date: 2018/11/29
  * @since: JDK 1.8
- * @description: TODO
+ * @description: 建行交易对账单文件读取
  */
 public class ReadShopFile implements Callable<HashMap> {
+    private String shopFilePath;
+    public ReadShopFile(String shopFilePath) {
+        this.shopFilePath = shopFilePath;
+    }
+
     @Override
     public HashMap call() throws Exception {
         HashMap hashMap = new HashMap(30);
-        try (Reader reader = new FileReader("C:/Users/lenovo/Desktop/延长壳牌建行聚合支付微信openid文件接口处理相关/SHOP.105000573992432.20181017.txt");
+        try (Reader reader = new FileReader(shopFilePath);
              LineNumberReader lineReader = new LineNumberReader(reader)){
             String str;
             int j = 0;
@@ -37,10 +42,12 @@ public class ReadShopFile implements Callable<HashMap> {
                         String openid = strings[7];
                         transList.add(ddje);
                         transList.add(jysj);
-                        transList.add(openid);
+                        // 对openid进行MD5加密
+                        MessageDigest md = MessageDigest.getInstance("MD5");
+                        transList.add(toHex(md.digest(openid.getBytes())));
                         hashMap.put(ptlsh, transList);
                         j ++;
-                        System.out.println(ptlsh + "当前是第:" + j);
+                        System.out.println("当前是第:" + j);
                     } catch (Exception e) {
                         System.out.println(lineReader.getLineNumber() + "不存在");
                     }
@@ -53,5 +60,13 @@ public class ReadShopFile implements Callable<HashMap> {
         }
         return hashMap;
 
+    }
+    public static String toHex(byte[] buffer) {
+        StringBuffer sb = new StringBuffer(buffer.length * 2);
+        for (int i = 0; i < buffer.length; i++) {
+            sb.append(Character.forDigit((buffer[i] & 240) >> 4, 16));
+            sb.append(Character.forDigit(buffer[i] & 15, 16));
+        }
+        return sb.toString();
     }
 }

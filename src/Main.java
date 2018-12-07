@@ -1,26 +1,26 @@
-import java.util.HashMap;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+
 
 /**
  * @author: zhangbaoning
  * @date: 2018/11/29
  * @since: JDK 1.8
- * @description: TODO
+ * @description: 对账文件生成主入口
  */
 public class Main {
+
     public static void main(String[] args) {
-        long start = System.currentTimeMillis();
-        HashMap<Integer,String> hashMap1 = new HashMap();
-        HashMap<Integer,String>  hashMap2 = new HashMap();
-        for (int i=0;i<1000000;i++){
-            hashMap1.put(i,"zhangbaoning");
-            hashMap2.put(i,"zhangyupeng");
-        }
-        for (int o : hashMap1.keySet()) {
-            if (hashMap2.containsKey(o)){
-                System.out.println(hashMap1.get(o)+hashMap2.get(o));
-            }
-        }
-        long end = System.currentTimeMillis();
-        System.out.println((end-start)/1000.000+"秒");
+        // 获取当天日期的18点
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,16);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+        Date date = calendar.getTime();
+
+        // 创建定时器从当天18点开始，每个一天时间进行再次执行
+        Timer timer = new Timer();
+        timer.schedule(new WriteFile(),date,24*60*60*1000);
     }
 }
